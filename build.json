@@ -1,0 +1,37 @@
+{
+  "buildNumber": 30,
+  "buildTS": 1681397981085,
+  "version": "1.0.3",
+  "filesSummary": [
+    {
+      "path": "build.json",
+      "crc": 1828846590,
+      "fileSize": 645
+    },
+    {
+      "path": "package.json",
+      "crc": 1929424543,
+      "fileSize": 632
+    },
+    {
+      "path": "src\\aq-logger.ts",
+      "crc": 1263072167,
+      "fileSize": 3201
+    },
+    {
+      "path": "src\\colors.ts",
+      "crc": 2981996779,
+      "fileSize": 1931
+    },
+    {
+      "path": "src\\index.ts",
+      "crc": 945942681,
+      "fileSize": 28
+    },
+    {
+      "path": "tsconfig.json",
+      "crc": 1760996401,
+      "fileSize": 380
+    }
+  ]
+}
