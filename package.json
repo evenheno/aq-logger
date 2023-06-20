@@ -1,12 +1,13 @@
 {
     "name": "aq-logger",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Aquarius Logger",
     "main": "index.js",
     "type": "commonjs",
     "scripts": {
         "build": "node scripts/pre-build && tsc && node scripts/post-build",
         "build:publish": "npm run build && cd dist && npm publish",
+        "build:test": "npm run build && node dist/test",
         "start": "cd build && node .",
         "build:start": "npm run build && npm run start"
     },

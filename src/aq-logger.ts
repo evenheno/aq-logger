@@ -1,4 +1,4 @@
-import { TNodeColor, EColors } from './colors';
+import { TNodeColor, ENodeColors, TColor, EWebColors, TWebColor } from './colors';
 
 const moduleColorsArr: Array<TNodeColor> = [
     'bgCyan', 'bgMagenta', 'bgRed',
@@ -9,6 +9,9 @@ interface colorsDictionary {
     [key: string]: string;
 }
 
+type TPlatform = 'Browser' | 'NodeJS';
+const platform: TPlatform = typeof window === 'undefined' ? 'NodeJS' : 'Browser';
+
 export class AQLogger {
     private _moduleName: string;
     private static _activeModules: colorsDictionary = {};
@@ -17,65 +20,69 @@ export class AQLogger {
         this._moduleName = moduleName;
         if (!AQLogger._activeModules[moduleName]) {
             const index = Object.keys(AQLogger._activeModules).length % moduleColorsArr.length;
-            AQLogger._activeModules[moduleName] = EColors[moduleColorsArr[index]];
+            AQLogger._activeModules[moduleName] = ENodeColors[moduleColorsArr[index]];
         }
     }
 
-    public log(message: string, ...data: any[]) {
+    public log(message: string, colors: TColor[], ...data:any[]) {
+        let output: Array<string>;
         const timestamp = new Date().toLocaleString();
+
+        if (platform === 'NodeJS') {
+            const colorsString = colors.map(color=> `${ENodeColors[color]}`);
+            output = [`[ ${timestamp} ] ${this._moduleName} ${colorsString}${message}${ENodeColors.reset}`];
+        } else if (platform === 'Browser') {
+            const colorsString = colors.map(color => `color:${EWebColors[color]};`).join('');
+            output = [`[ ${timestamp} ] ${this._moduleName} %c${message}${ENodeColors.reset}`, colorsString];
+        } else{
+            output = [message];
+        }
+
+        console.log(...output);
+        /*const timestamp = new Date().toLocaleString();
         const moduleColorPrint = AQLogger._activeModules[this._moduleName] || '';
         const logMessage = `[ ${timestamp} ] ${moduleColorPrint} ${this._moduleName.padEnd(15)} ${EColors.reset} ${message}`;
-        console.log(logMessage, ...data);
+        console.log(logMessage, ...data);*/
     }
 
     public debug(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgBlue}${EColors.dim}DEBUG: ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(message, ['fgMagenta'], ...data);
     }
 
     public trace(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgWhite}${EColors.dim}TRACE: ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(message, ['fgCyan'], ...data);
     }
 
     public action(message: string, ...data: any[]) {
-        const coloredMessage = `• ${message}..${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(`${message}...`, ['fgYellow'], ...data);
     }
 
     public warn(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgYellow}${EColors.bright}WARNING: ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(`WARNING: ${message}`, ['fgYellow'], ...data);
     }
 
     public event(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgCyan}${EColors.bright}EVENT: ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(`${message}`, ['fgCyan'], ...data);        
     }
 
     public info(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgBlue}${EColors.bright}• ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(`INFO: ${message}`, ['fgCyan'], ...data);
     }
 
     public success(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgGreen}${EColors.bright}✔ ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(`${message}`, ['fgGreen'], ...data);
     }
 
     public results(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgRed}${EColors.bright}• Results => ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(`${message}`, ['fgMagenta'], ...data);
     }
 
     public request(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.bgRed}${EColors.bright}${EColors.fgWhite}🌐 ${message}${EColors.reset}`;
-        this.log(coloredMessage, ...data);
+        this.log(`Request: ${message}`, ['fgCyan'], ...data);
     }
 
     public error(message: string, ...data: any[]) {
-        const coloredMessage = `${EColors.fgRed}${EColors.bright}${EColors.fgRed}${message}${EColors.reset}`;
-        this.log(coloredMessage);
+        this.log(`${message}`, ['fgRed'], ...data);
     }
 }
 

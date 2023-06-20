@@ -1,36 +1,176 @@
 {
-  "buildNumber": 30,
-  "buildTS": 1681397981085,
-  "version": "1.0.3",
+  "buildNumber": 34,
+  "buildTS": 1687285740501,
+  "version": "1.0.4",
   "filesSummary": [
     {
+      "path": ".git\\config",
+      "crc": 3865846866,
+      "fileSize": 300
+    },
+    {
+      "path": ".git\\description",
+      "crc": 1686783237,
+      "fileSize": 73
+    },
+    {
+      "path": ".git\\HEAD",
+      "crc": 3478276331,
+      "fileSize": 21
+    },
+    {
+      "path": ".git\\hooks\\applypatch-msg.sample",
+      "crc": 413972383,
+      "fileSize": 478
+    },
+    {
+      "path": ".git\\hooks\\commit-msg.sample",
+      "crc": 3516257369,
+      "fileSize": 896
+    },
+    {
+      "path": ".git\\hooks\\fsmonitor-watchman.sample",
+      "crc": 398042483,
+      "fileSize": 4726
+    },
+    {
+      "path": ".git\\hooks\\post-update.sample",
+      "crc": 1322816844,
+      "fileSize": 189
+    },
+    {
+      "path": ".git\\hooks\\pre-applypatch.sample",
+      "crc": 218412860,
+      "fileSize": 424
+    },
+    {
+      "path": ".git\\hooks\\pre-commit.sample",
+      "crc": 4050005976,
+      "fileSize": 1643
+    },
+    {
+      "path": ".git\\hooks\\pre-merge-commit.sample",
+      "crc": 582768542,
+      "fileSize": 416
+    },
+    {
+      "path": ".git\\hooks\\pre-push.sample",
+      "crc": 1456508436,
+      "fileSize": 1374
+    },
+    {
+      "path": ".git\\hooks\\pre-rebase.sample",
+      "crc": 4213796159,
+      "fileSize": 4898
+    },
+    {
+      "path": ".git\\hooks\\pre-receive.sample",
+      "crc": 4003033454,
+      "fileSize": 544
+    },
+    {
+      "path": ".git\\hooks\\prepare-commit-msg.sample",
+      "crc": 74588135,
+      "fileSize": 1492
+    },
+    {
+      "path": ".git\\hooks\\push-to-checkout.sample",
+      "crc": 2254252342,
+      "fileSize": 2783
+    },
+    {
+      "path": ".git\\hooks\\update.sample",
+      "crc": 2048255035,
+      "fileSize": 3650
+    },
+    {
+      "path": ".git\\index",
+      "crc": 2130221289,
+      "fileSize": 1022
+    },
+    {
+      "path": ".git\\info\\exclude",
+      "crc": 3994496080,
+      "fileSize": 240
+    },
+    {
+      "path": ".git\\logs\\HEAD",
+      "crc": 128524579,
+      "fileSize": 186
+    },
+    {
+      "path": ".git\\logs\\refs\\heads\\main",
+      "crc": 56578112,
+      "fileSize": 186
+    },
+    {
+      "path": ".git\\logs\\refs\\remotes\\origin\\HEAD",
+      "crc": 934788790,
+      "fileSize": 186
+    },
+    {
+      "path": ".git\\objects\\pack\\pack-12a7654783ec9a999c15afd380dbfa3fb5b44650.idx",
+      "crc": 3037556516,
+      "fileSize": 1548
+    },
+    {
+      "path": ".git\\objects\\pack\\pack-12a7654783ec9a999c15afd380dbfa3fb5b44650.pack",
+      "crc": 1277042624,
+      "fileSize": 5806
+    },
+    {
+      "path": ".git\\packed-refs",
+      "crc": 2344528403,
+      "fileSize": 112
+    },
+    {
+      "path": ".git\\refs\\heads\\main",
+      "crc": 262213693,
+      "fileSize": 41
+    },
+    {
+      "path": ".git\\refs\\remotes\\origin\\HEAD",
+      "crc": 2055738719,
+      "fileSize": 30
+    },
+    {
       "path": "build.json",
-      "crc": 1828846590,
-      "fileSize": 645
+      "crc": 1995519668,
+      "fileSize": 3634
     },
     {
       "path": "package.json",
-      "crc": 1929424543,
-      "fileSize": 632
+      "crc": 3490064203,
+      "fileSize": 690
+    },
+    {
+      "path": "README.md",
+      "crc": 2347343555,
+      "fileSize": 30
     },
     {
       "path": "src\\aq-logger.ts",
-      "crc": 1263072167,
-      "fileSize": 3201
+      "crc": 2331496580,
+      "fileSize": 3180
     },
     {
       "path": "src\\colors.ts",
-      "crc": 2981996779,
-      "fileSize": 1931
+      "crc": 45155038,
+      "fileSize": 1928
     },
     {
       "path": "src\\index.ts",
-      "crc": 945942681,
+      "crc": 551893113,
       "fileSize": 28
     },
     {
+      "path": "src\\test.ts",
+      "crc": 62287343,
+      "fileSize": 113
+    },
+    {
       "path": "tsconfig.json",
-      "crc": 1760996401,
+      "crc": 4264461109,
       "fileSize": 380
     }
   ]

@@ -1,8 +1,8 @@
-export type TNodeColor = keyof typeof EColors;
+export type TNodeColor = keyof typeof ENodeColors;
 export type TWebColor = keyof typeof EWebColors;
-export type TColor = keyof typeof EColors & EWebColors;
+export type TColor = TNodeColor & TWebColor;
 
-export enum EColors {
+export enum ENodeColors {
     bgBlack = "\x1b[40m",
     bgRed = "\x1b[41m",
     bgGreen = "\x1b[42m",
