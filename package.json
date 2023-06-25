@@ -1,6 +1,6 @@
 {
     "name": "aq-logger",
-    "version": "1.0.5",
+    "version": "1.0.11",
     "description": "Aquarius Logger",
     "main": "index.js",
     "type": "commonjs",
@@ -9,7 +9,8 @@
         "build:publish": "npm run build && cd dist && npm publish",
         "build:test": "npm run build && node dist/test",
         "start": "cd build && node .",
-        "build:start": "npm run build && npm run start"
+        "build:start": "npm run build && npm run start",
+        "x": "npm run build && cd ../models-catalog/client-2 && npm install aq-logger && npm run start"
     },
     "author": "Aquarius Systems Inc.",
     "license": "ISC",

@@ -1,181 +1,251 @@
 {
-  "buildNumber": 38,
-  "buildTS": 1687675845905,
-  "version": "1.0.5",
+  "buildNumber": 119,
+  "buildTS": 1687700769227,
+  "version": "1.0.11",
   "filesSummary": [
     {
+      "path": ".git/COMMIT_EDITMSG",
+      "crc": 2971681815,
+      "fileSize": 6
+    },
+    {
       "path": ".git/HEAD",
-      "crc": 3919534529,
+      "crc": 438992402,
       "fileSize": 21
     },
     {
       "path": ".git/config",
-      "crc": 2059223458,
+      "crc": 3027490504,
       "fileSize": 258
     },
     {
       "path": ".git/description",
-      "crc": 1982965459,
+      "crc": 1549718289,
       "fileSize": 73
     },
     {
       "path": ".git/hooks/applypatch-msg.sample",
-      "crc": 47212313,
+      "crc": 1041349870,
       "fileSize": 478
     },
     {
       "path": ".git/hooks/commit-msg.sample",
-      "crc": 2332656012,
+      "crc": 3868442331,
       "fileSize": 896
     },
     {
       "path": ".git/hooks/fsmonitor-watchman.sample",
-      "crc": 806734635,
+      "crc": 1329399968,
       "fileSize": 4726
     },
     {
       "path": ".git/hooks/post-update.sample",
-      "crc": 2866411697,
+      "crc": 3244826837,
       "fileSize": 189
     },
     {
       "path": ".git/hooks/pre-applypatch.sample",
-      "crc": 2945127457,
+      "crc": 4012398073,
       "fileSize": 424
     },
     {
       "path": ".git/hooks/pre-commit.sample",
-      "crc": 2078975038,
+      "crc": 2353065194,
       "fileSize": 1643
     },
     {
       "path": ".git/hooks/pre-merge-commit.sample",
-      "crc": 1739320612,
+      "crc": 874833537,
       "fileSize": 416
     },
     {
       "path": ".git/hooks/pre-push.sample",
-      "crc": 1952132345,
+      "crc": 2214557142,
       "fileSize": 1374
     },
     {
       "path": ".git/hooks/pre-rebase.sample",
-      "crc": 2634677424,
+      "crc": 3255171897,
       "fileSize": 4898
     },
     {
       "path": ".git/hooks/pre-receive.sample",
-      "crc": 2612855621,
+      "crc": 167523033,
       "fileSize": 544
     },
     {
       "path": ".git/hooks/prepare-commit-msg.sample",
-      "crc": 675924403,
+      "crc": 3705311915,
       "fileSize": 1492
     },
     {
       "path": ".git/hooks/push-to-checkout.sample",
-      "crc": 1388461971,
+      "crc": 2142856456,
       "fileSize": 2783
     },
     {
       "path": ".git/hooks/update.sample",
-      "crc": 4201997265,
+      "crc": 3014237373,
       "fileSize": 3650
     },
     {
       "path": ".git/index",
-      "crc": 1105324679,
+      "crc": 54746931,
       "fileSize": 1182
     },
     {
       "path": ".git/info/exclude",
-      "crc": 873043640,
+      "crc": 3510930972,
       "fileSize": 240
     },
     {
       "path": ".git/logs/HEAD",
-      "crc": 810630785,
-      "fileSize": 178
+      "crc": 1414363416,
+      "fileSize": 324
     },
     {
       "path": ".git/logs/refs/heads/main",
-      "crc": 2544035704,
-      "fileSize": 178
+      "crc": 1102271012,
+      "fileSize": 324
     },
     {
       "path": ".git/logs/refs/remotes/origin/HEAD",
-      "crc": 632639338,
+      "crc": 183517411,
       "fileSize": 178
     },
     {
+      "path": ".git/logs/refs/remotes/origin/main",
+      "crc": 1465808488,
+      "fileSize": 147
+    },
+    {
+      "path": ".git/objects/18/268e63ed0b705c0980d2148d05ea91f2eab6ba",
+      "crc": 2941127670,
+      "fileSize": 1119
+    },
+    {
+      "path": ".git/objects/21/e687929a928c408e12e9c5fd08b56d9e1618ee",
+      "crc": 3438764280,
+      "fileSize": 148
+    },
+    {
+      "path": ".git/objects/40/5432b6488962821f979514183ac9a345999e0a",
+      "crc": 882424634,
+      "fileSize": 906
+    },
+    {
+      "path": ".git/objects/ca/01a505257d3b920ace8cd15415b069e2859919",
+      "crc": 143967643,
+      "fileSize": 1037
+    },
+    {
+      "path": ".git/objects/d3/21dc76916c3cb9a4d3a58906bfc36d8ebc320b",
+      "crc": 3798977390,
+      "fileSize": 312
+    },
+    {
+      "path": ".git/objects/f8/bba01abae704736b9dfc3e7a0095318761d9b9",
+      "crc": 2416022379,
+      "fileSize": 156
+    },
+    {
+      "path": ".git/objects/fd/263ee9153f19964bd724722e19adbd9e2b33c0",
+      "crc": 3384205119,
+      "fileSize": 278
+    },
+    {
       "path": ".git/objects/pack/pack-ab9bda09b6d7f80f60613faa9409d4d949336958.idx",
-      "crc": 1902600386,
+      "crc": 779021858,
       "fileSize": 1828
     },
     {
       "path": ".git/objects/pack/pack-ab9bda09b6d7f80f60613faa9409d4d949336958.pack",
-      "crc": 671037236,
+      "crc": 3380988647,
       "fileSize": 8207
     },
     {
       "path": ".git/packed-refs",
-      "crc": 1728525845,
+      "crc": 784093665,
       "fileSize": 112
     },
     {
       "path": ".git/refs/heads/main",
-      "crc": 4066647794,
+      "crc": 3245340835,
       "fileSize": 41
     },
     {
       "path": ".git/refs/remotes/origin/HEAD",
-      "crc": 1116196128,
+      "crc": 2497729595,
       "fileSize": 30
     },
     {
+      "path": ".git/refs/remotes/origin/main",
+      "crc": 307721828,
+      "fileSize": 41
+    },
+    {
       "path": ".gitignore",
-      "crc": 2892342099,
+      "crc": 2449522134,
       "fileSize": 17
     },
     {
       "path": "README.md",
-      "crc": 3430376595,
+      "crc": 405516826,
       "fileSize": 28
     },
     {
       "path": "build.json",
-      "crc": 2243849472,
-      "fileSize": 3661
+      "crc": 4177099742,
+      "fileSize": 5303
     },
     {
       "path": "package.json",
-      "crc": 4123046584,
-      "fileSize": 690
+      "crc": 64469884,
+      "fileSize": 797
     },
     {
-      "path": "src/aq-logger.ts",
-      "crc": 1693872872,
-      "fileSize": 3655
+      "path": "src/class/aq-logger.ts",
+      "crc": 3537207218,
+      "fileSize": 3834
     },
     {
-      "path": "src/colors.ts",
-      "crc": 743683699,
-      "fileSize": 1928
+      "path": "src/class/exception.ts",
+      "crc": 3474143926,
+      "fileSize": 1581
+    },
+    {
+      "path": "src/global/const.ts",
+      "crc": 1638357618,
+      "fileSize": 528
+    },
+    {
+      "path": "src/global/enums.ts",
+      "crc": 2370917039,
+      "fileSize": 2002
+    },
+    {
+      "path": "src/global/types.ts",
+      "crc": 2845904124,
+      "fileSize": 369
+    },
+    {
+      "path": "src/global/utils.ts",
+      "crc": 1093418418,
+      "fileSize": 259
     },
     {
       "path": "src/index.ts",
-      "crc": 553506622,
-      "fileSize": 28
+      "crc": 3358865069,
+      "fileSize": 69
     },
     {
       "path": "src/test.ts",
-      "crc": 4285893892,
-      "fileSize": 109
+      "crc": 330034308,
+      "fileSize": 202
     },
     {
       "path": "tsconfig.json",
-      "crc": 1840841397,
+      "crc": 3744182587,
       "fileSize": 380
     }
   ]
