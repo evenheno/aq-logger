@@ -9,8 +9,7 @@
         "build:publish": "npm run build && cd dist && npm publish",
         "build:test": "npm run build && node dist/test",
         "start": "cd build && node .",
-        "build:start": "npm run build && npm run start",
-        "x": "npm run build && cd ../models-catalog/client-2 && npm install aq-logger && npm run start"
+        "build:start": "npm run build && npm run start"
     },
     "author": "Aquarius Systems Inc.",
     "license": "ISC",
