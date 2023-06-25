@@ -20,29 +20,39 @@ export class AQLogger {
         this._moduleName = moduleName;
         if (!AQLogger._activeModules[moduleName]) {
             const index = Object.keys(AQLogger._activeModules).length % moduleColorsArr.length;
-            AQLogger._activeModules[moduleName] = ENodeColors[moduleColorsArr[index]];
+            const dictionary = platform === 'NodeJS' ? ENodeColors : platform === 'Browser' ? EWebColors : null;
+            if(!dictionary){ AQLogger._activeModules[moduleName] = moduleName; return;}
+            AQLogger._activeModules[moduleName] = dictionary[moduleColorsArr[index]];
         }
+    }
+
+    private _paint(text: string, colors: TColor[]){
+        let output: Array<string>;
+        if (platform === 'NodeJS') {
+            const strColors = colors.map(color=> `${ENodeColors[color]}`);
+            output = [`${strColors}${text}${ENodeColors.reset}`];
+        } else if (platform === 'Browser') {
+            const strStyles = colors.map(color => `color:${EWebColors[color]};`).join('');
+            output = [`%c${text}`, strStyles];
+        } else{
+            output = [text];
+        }
+        return output;
     }
 
     public log(message: string, colors: TColor[], ...data:any[]) {
         let output: Array<string>;
-        const timestamp = new Date().toLocaleString();
-
+        const ts = new Date().toLocaleString();
         if (platform === 'NodeJS') {
             const colorsString = colors.map(color=> `${ENodeColors[color]}`);
-            output = [`[ ${timestamp} ] ${this._moduleName} ${colorsString}${message}${ENodeColors.reset}`];
+            output = [`${ENodeColors.dim}[${ts}]${ENodeColors.reset} ${ENodeColors.bright}${this._moduleName}${ENodeColors.reset} ${colorsString}${message}${ENodeColors.reset}`];
         } else if (platform === 'Browser') {
             const colorsString = colors.map(color => `color:${EWebColors[color]};`).join('');
-            output = [`[ ${timestamp} ] ${this._moduleName} %c${message}${ENodeColors.reset}`, colorsString];
+            output = [`[${ts}] ${this._moduleName} %c${message}`, colorsString];
         } else{
             output = [message];
         }
-
-        console.log(...output);
-        /*const timestamp = new Date().toLocaleString();
-        const moduleColorPrint = AQLogger._activeModules[this._moduleName] || '';
-        const logMessage = `[ ${timestamp} ] ${moduleColorPrint} ${this._moduleName.padEnd(15)} ${EColors.reset} ${message}`;
-        console.log(logMessage, ...data);*/
+        console.log(...output, ...data);
     }
 
     public debug(message: string, ...data: any[]) {
