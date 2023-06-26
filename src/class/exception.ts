@@ -1,6 +1,7 @@
 import { generateId } from "../global/utils";
 
 export class Exception {
+    private _type = 'exception';
     private _name: string;
     private _message: string;
     private _error: any;
@@ -34,19 +35,13 @@ export class Exception {
     public toString() {
         let errorDesc: string = '';
         if (this._error instanceof Error) {
-            errorDesc = this._error.message || '';
+            errorDesc = `\n${this._error.message}` || '';
         } else if (typeof this._error === 'string') {
-            errorDesc = this._error;
-        } else if (this._error instanceof Exception) {
-            errorDesc = this._error.message || '';
+            errorDesc = `\n-${this._error}`;
+        } else if (this._error instanceof Exception &&
+            this._error._type === this._type) {
+            errorDesc = `\n-${this._error}` || '';
         }
-
-        const result = [
-            `${this.name}Error:`,
-            this.message,
-            errorDesc,
-            `(#${this._errorId})`
-        ].filter(i => i.length).join(' ');
-        return result;
+        return `${this.name}Error: ${this.message} (${this._errorId})${errorDesc}`
     }
 }

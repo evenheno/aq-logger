@@ -1,2 +1,2 @@
 import { AQLogger } from '.';
-const logger = new AQLogger('AQLoggerTest', 'A');
+const logger = new AQLogger('AQLoggerTest');

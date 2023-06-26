@@ -3,9 +3,11 @@ import { ENodeColors, EWebColors } from '../global/enums';
 import { Exception } from './exception';
 import { activeModules, moduleColors, platform } from '../global/const';
 
-export class AQLogger<T extends string | number | symbol = TLogLevel> {
+export class AQLogger<T extends string = TLogLevel> {
+
+    private static logLevels: { [key: string]: boolean } = {};
     private _moduleName: string;
-    public whiteList: { [key in T]?: boolean };
+    public whiteList: { [key in T as string]?: boolean };
     public logLevel?: T;
 
     constructor(moduleName: string, logLevel?: T) {
@@ -21,6 +23,11 @@ export class AQLogger<T extends string | number | symbol = TLogLevel> {
             } else { throw `Unsupported platform: ${platform}` }
             activeModules[moduleName] = moduleColors[index];
         }
+    }
+
+    public static setLogLevels<T extends string>(
+        logLevels: { [key in T | TLogLevel]?: boolean }) {
+        AQLogger.logLevels = logLevels as { [key: string]: boolean };
     }
 
     private _getColor(key: TColor) {
@@ -45,6 +52,11 @@ export class AQLogger<T extends string | number | symbol = TLogLevel> {
         }
     }
 
+    private _wrapData(data?: any) {
+        if (!data) { return [] }
+        return [data];
+    }
+
     public log(message: string, colors: TColor[], ...data: any[]) {
         const ts = new Date().toLocaleString();
         const browserStyle: Array<string> = [];
@@ -57,51 +69,107 @@ export class AQLogger<T extends string | number | symbol = TLogLevel> {
         console.log(logMessage, ...browserStyle, ...data);
     }
 
-    public debug(message: string, ...data: any[]) {
-        this.log(`🐞 ${message}`, ['fgMagenta'], ...data);
+    private _resolve(param1?: T | object, param2?: object) {
+        const logLevels = ((typeof param1 === 'string') ? param1 : param2) as T;
+        const data = ((typeof param1 === 'object') ? param1 : undefined);
+        if (!logLevels) { return { data: data, allowPrint: true } }
+        let allowPrint = false;
+        if (logLevels && Array.isArray(logLevels)) {
+            for (let item of logLevels) {
+                const allow = AQLogger.logLevels[item] === true;
+                if (allow) { allowPrint = true; break; }
+            }
+        } else if (logLevels && AQLogger.logLevels[logLevels as string] === true) {
+            allowPrint = true;
+        }
+        return { data: data, allowPrint: allowPrint };
     }
 
-    public trace(message: string, ...data: any[]) {
-        this.log(message, ['fgCyan'], ...data);
+    public action(message: string): void
+    public action(message: string, logLevel: T): void
+    public action(message: string, data: object): void
+    public action(message: string, logLevel: T, data: object): void
+    public action(message: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`⚙️ ${message}...`, ['fgYellow'], ...this._wrapData(data));
     }
 
-    public action(message: string, ...data: any[]) {
-        this.log(`${message}...`, ['fgYellow'], ...data);
+    public warn(message: string): void
+    public warn(message: string, logLevel: T): void
+    public warn(message: string, data: object): void
+    public warn(message: string, logLevel: T, data: object): void
+    public warn(message: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`⚠️ ${message}...`, ['fgYellow'], ...this._wrapData(data));
     }
 
-    public warn(message: string, ...data: any[]) {
-        this.log(`⚠️ ${message}`, ['fgYellow'], ...data);
+    public info(message: string): void
+    public info(message: string, logLevel: T): void
+    public info(message: string, data: object): void
+    public info(message: string, logLevel: T, data: object): void
+    public info(message: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`ℹ️ ${message}...`, ['fgCyan'], ...this._wrapData(data));
     }
 
-    public event(message: string, ...data: any[]) {
-        this.log(`${message}`, ['fgCyan'], ...data);
+    public success(message: string): void
+    public success(message: string, logLevel: T): void
+    public success(message: string, data: object): void
+    public success(message: string, logLevel: T, data: object): void
+    public success(message: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`✅ ${message}...`, ['fgCyan'], ...this._wrapData(data));
     }
 
-    public info(message: string, ...data: any[]) {
-        this.log(`INFO: ${message}`, ['fgCyan'], ...data);
+    public debug(message: string): void
+    public debug(message: string, logLevel: T): void
+    public debug(message: string, data: object): void
+    public debug(message: string, logLevel: T, data: object): void
+    public debug(message: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`🐞 ${message}...`, ['fgMagenta'], ...this._wrapData(data));
     }
 
-    public success(message: string, ...data: any[]) {
-        this.log(`✅ ${message}`, ['fgGreen'], ...data);
+    public event(message: string): void
+    public event(message: string, logLevel: T): void
+    public event(message: string, data: object): void
+    public event(message: string, logLevel: T, data: object): void
+    public event(message: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`⚡ ${message}...`, ['fgMagenta'], ...this._wrapData(data));
     }
 
-    public results(message: string, ...data: any[]) {
-        this.log(`${message}`, ['fgMagenta'], ...data);
+    public request(path: string, method: string): void
+    public request(path: string, method: string, logLevel: T): void
+    public request(path: string, method: string, data: object): void
+    public request(path: string, method: string, logLevel: T, data: object): void
+    public request(path: string, method: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`🌐 ${method.toUpperCase()} Request: ${path}`,
+            ['fgMagenta'], ...this._wrapData(data));
     }
 
-    public request(message: string, ...data: any[]) {
-        this.log(`🌐 ${message}`, ['fgCyan'], ...data);
-    }
-
-    public error(message: string, ...data: any[]) {
-        this.log(`❌ ${message}`, ['fgRed'], ...data);
+    public error(message: string): void
+    public error(message: string, logLevel: T): void
+    public error(message: string, data: object): void
+    public error(message: string, logLevel: T, data: object): void
+    public error(message: string, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        if (!allowPrint) { return }
+        this.log(`🔴 ${message}`, ['fgRed'], ...this._wrapData(data));
     }
 
     public exception(message: string, error?: any,) {
-        const exception = new Exception(this._moduleName, message, error);
-        this.error(`${exception}`);
-        return exception;
+        return new Exception(this._moduleName, message, error);
     }
+
 }
 
 export const aqLogger = new AQLogger('System');

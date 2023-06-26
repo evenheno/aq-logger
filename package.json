@@ -1,6 +1,6 @@
 {
     "name": "aq-logger",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "description": "Aquarius Logger",
     "main": "index.js",
     "type": "commonjs",
