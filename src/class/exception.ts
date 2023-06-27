@@ -35,12 +35,12 @@ export class Exception {
     public toString() {
         let errorDesc: string = '';
         if (this._error instanceof Error) {
-            errorDesc = `\n${this._error.message}` || '';
+            errorDesc = `\n- ${this._error.message}` || '';
         } else if (typeof this._error === 'string') {
-            errorDesc = `\n-${this._error}`;
+            errorDesc = `\n- ${this._error}`;
         } else if (this._error instanceof Exception &&
             this._error._type === this._type) {
-            errorDesc = `\n-${this._error}` || '';
+            errorDesc = `\n- ${this._error}` || '';
         }
         return `${this.name}Error: ${this.message} (${this._errorId})${errorDesc}`
     }

@@ -2,17 +2,32 @@ import { TColor, TLogLevel } from '../global/types';
 import { ENodeColors, EWebColors } from '../global/enums';
 import { Exception } from './exception';
 import { activeModules, moduleColors, platform } from '../global/const';
+import { ensureArray } from '../global/utils';
+type T = TLogLevel | Array<TLogLevel>;
 
-export class AQLogger<T extends string = TLogLevel> {
+export type TAQLoggerOptions = {
+    useLogLevel?: boolean,
+    logLevels?: T
+}
 
-    private static logLevels: { [key: string]: boolean } = {};
+export class AQLogger {
+
     private _moduleName: string;
-    public whiteList: { [key in T as string]?: boolean };
-    public logLevel?: T;
+    private static _logLevel: { [key: string]: boolean } = {};
+    public static printTimestamp: boolean = true;
 
-    constructor(moduleName: string, logLevel?: T) {
+    constructor(moduleName: string) {
         this._moduleName = moduleName;
-        this.whiteList = {};
+
+        //Initiate logger's log levels
+
+        /*if (AQLogger.options?.logLevels) {
+            const logLevels = ensureArray(AQLogger.options.logLevels);
+            for (let logLevel of logLevels) {
+                this.logLevel[logLevel as string] = true;
+            }
+        }*/
+
         if (!activeModules[moduleName]) {
             const index = Object.keys(activeModules).length % moduleColors.length;
             let dictionary: typeof ENodeColors | typeof EWebColors;
@@ -25,9 +40,11 @@ export class AQLogger<T extends string = TLogLevel> {
         }
     }
 
-    public static setLogLevels<T extends string>(
-        logLevels: { [key in T | TLogLevel]?: boolean }) {
-        AQLogger.logLevels = logLevels as { [key: string]: boolean };
+    public static setLogLevel(...logLevel: Array<TLogLevel>) {
+        const list = ensureArray<T>(logLevel);
+        for (let item of list) {
+            AQLogger._logLevel[item as string] = true;
+        }
     }
 
     private _getColor(key: TColor) {
@@ -61,28 +78,34 @@ export class AQLogger<T extends string = TLogLevel> {
         const ts = new Date().toLocaleString();
         const browserStyle: Array<string> = [];
         const moduleColor = activeModules[this._moduleName];
-        const logMessage = [
-            this._paint(`[${ts}] `, ['dim'], browserStyle),
+        const logMessage = [];
+        if (AQLogger.printTimestamp) {
+            logMessage.push(this._paint(`[${ts}] `, ['dim'], browserStyle));
+        }
+        logMessage.push(
             this._paint(` ${this._moduleName} `, moduleColor, browserStyle),
             this._paint(` ${message}`, colors, browserStyle)
-        ].join('');
-        console.log(logMessage, ...browserStyle, ...data);
+        );
+        console.log(logMessage.join(''), ...browserStyle, ...data);
     }
 
     private _resolve(param1?: T | object, param2?: object) {
         const logLevels = ((typeof param1 === 'string') ? param1 : param2) as T;
         const data = ((typeof param1 === 'object') ? param1 : undefined);
-        if (!logLevels) { return { data: data, allowPrint: true } }
-        let allowPrint = false;
-        if (logLevels && Array.isArray(logLevels)) {
-            for (let item of logLevels) {
-                const allow = AQLogger.logLevels[item] === true;
-                if (allow) { allowPrint = true; break; }
+        if (!logLevels) { return { data, allowPrint: true } }
+
+        //Check if log is allowed according to module log level and global log level
+        const logLevelsArr = ensureArray<T>(logLevels);
+        for (let logLevel of logLevelsArr) {
+            const allowGlobal = AQLogger._logLevel[logLevel as string] === true;
+            //const allowModule = this.logLevels[logLevel as string] === true;
+            if (allowGlobal) {
+                return { data, allowPrint: true }
             }
-        } else if (logLevels && AQLogger.logLevels[logLevels as string] === true) {
-            allowPrint = true;
         }
-        return { data: data, allowPrint: allowPrint };
+
+        //Log is not allowed to be printed, return false
+        return { allowPrint: false };
     }
 
     public action(message: string): void
@@ -92,7 +115,7 @@ export class AQLogger<T extends string = TLogLevel> {
     public action(message: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
         if (!allowPrint) { return }
-        this.log(`⚙️ ${message}...`, ['fgYellow'], ...this._wrapData(data));
+        allowPrint && this.log(`⋄ ${message}...`, ['fgYellow'], ...this._wrapData(data));
     }
 
     public warn(message: string): void
@@ -102,7 +125,7 @@ export class AQLogger<T extends string = TLogLevel> {
     public warn(message: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
         if (!allowPrint) { return }
-        this.log(`⚠️ ${message}...`, ['fgYellow'], ...this._wrapData(data));
+        allowPrint && this.log(`⚠️ WARNING: ${message}...`, ['fgYellow'], ...this._wrapData(data));
     }
 
     public info(message: string): void
@@ -112,7 +135,7 @@ export class AQLogger<T extends string = TLogLevel> {
     public info(message: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
         if (!allowPrint) { return }
-        this.log(`ℹ️ ${message}...`, ['fgCyan'], ...this._wrapData(data));
+        allowPrint && this.log(`🛈 ${message}`, ['fgCyan'], ...this._wrapData(data));
     }
 
     public success(message: string): void
@@ -122,7 +145,7 @@ export class AQLogger<T extends string = TLogLevel> {
     public success(message: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
         if (!allowPrint) { return }
-        this.log(`✅ ${message}...`, ['fgCyan'], ...this._wrapData(data));
+        allowPrint && this.log(`√ ${message}`, ['fgGreen'], ...this._wrapData(data));
     }
 
     public debug(message: string): void
@@ -131,8 +154,7 @@ export class AQLogger<T extends string = TLogLevel> {
     public debug(message: string, logLevel: T, data: object): void
     public debug(message: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
-        if (!allowPrint) { return }
-        this.log(`🐞 ${message}...`, ['fgMagenta'], ...this._wrapData(data));
+        allowPrint && this.log(`🐞 [DEBUG] ${message}...`, ['fgMagenta'], ...this._wrapData(data));
     }
 
     public event(message: string): void
@@ -141,8 +163,7 @@ export class AQLogger<T extends string = TLogLevel> {
     public event(message: string, logLevel: T, data: object): void
     public event(message: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
-        if (!allowPrint) { return }
-        this.log(`⚡ ${message}...`, ['fgMagenta'], ...this._wrapData(data));
+        allowPrint && this.log(`⚡ [EVENT] ${message}...`, ['fgMagenta'], ...this._wrapData(data));
     }
 
     public request(path: string, method: string): void
@@ -151,25 +172,36 @@ export class AQLogger<T extends string = TLogLevel> {
     public request(path: string, method: string, logLevel: T, data: object): void
     public request(path: string, method: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
-        if (!allowPrint) { return }
-        this.log(`🌐 ${method.toUpperCase()} Request: ${path}`,
-            ['fgMagenta'], ...this._wrapData(data));
+        allowPrint && this.log(`🌐 [REQUEST] ${method.toUpperCase()} ${path}`,
+            ['fgBlue'], ...this._wrapData(data));
     }
 
-    public error(message: string): void
-    public error(message: string, logLevel: T): void
-    public error(message: string, data: object): void
-    public error(message: string, logLevel: T, data: object): void
-    public error(message: string, param1?: T | object, param2?: object) {
+    public response(path: string, method: string): void
+    public response(path: string, method: string, logLevel: T): void
+    public response(path: string, method: string, data: object): void
+    public response(path: string, method: string, logLevel: T, data: object): void
+    public response(path: string, method: string, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
-        if (!allowPrint) { return }
-        this.log(`🔴 ${message}`, ['fgRed'], ...this._wrapData(data));
+        allowPrint && this.log(`🌐 [RESPONSE] ${method.toUpperCase()} ${path}`,
+            ['fgBlue'], ...this._wrapData(data));
     }
 
-    public exception(message: string, error?: any,) {
-        return new Exception(this._moduleName, message, error);
+    public error(message: string | Exception): void
+    public error(message: string | Exception, logLevel: T): void
+    public error(message: string | Exception, data: object): void
+    public error(message: string | Exception, logLevel: T, data: object): void
+    public error(message: string | Exception, param1?: T | object, param2?: object) {
+        const { data, allowPrint } = this._resolve(param1, param2);
+        allowPrint && this.log(`🔴 ${message}`, ['fgRed'], ...this._wrapData(data));
     }
 
+    public exception(message: string, error?: any): Exception
+    public exception(message: string, statusCode: number): Exception
+    public exception(message: string, param1: unknown, param2?: number) {
+        const statusCode = (typeof (param1) === 'number') ? param1 : param2;
+        const error = (typeof (param1) !== 'number') ? param1 : undefined;
+        return new Exception(this._moduleName, message, error, statusCode);
+    }
 }
 
 export const aqLogger = new AQLogger('System');

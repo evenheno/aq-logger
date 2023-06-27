@@ -10,7 +10,7 @@ export interface colorsDictionary {
 }
 
 export type TLogLevel =
-    'prod' | 'dev' | 'verbose' |
-    'debug' | 'db' | 'apiLogic' |
-    'bLogic' | 'daLogic'
+    'uiLogic' | 'bLogic' | 'daLogic' |
+    'dbLogic' | 'apiLogic' | 'sysLogic' |
+    'fsLogic' | 'dev' | 'staging' | 'prod'
 ;
