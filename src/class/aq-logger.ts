@@ -186,18 +186,20 @@ export class AQLogger {
             ['fgBlue'], ...this._wrapData(data));
     }
 
-    public error(message: string | Exception): void
-    public error(message: string | Exception, logLevel: T): void
-    public error(message: string | Exception, data: object): void
-    public error(message: string | Exception, logLevel: T, data: object): void
-    public error(message: string | Exception, param1?: T | object, param2?: object) {
+    public error(message: any): void
+    public error(message: any, logLevel: T): void
+    public error(message: any, data: object): void
+    public error(message: any, logLevel: T, data: object): void
+    public error(message: any, param1?: T | object, param2?: object) {
         const { data, allowPrint } = this._resolve(param1, param2);
         allowPrint && this.log(`🔴 ${message}`, ['fgRed'], ...this._wrapData(data));
     }
 
+    public exception(message: string): Exception
     public exception(message: string, error?: any): Exception
-    public exception(message: string, statusCode: number): Exception
-    public exception(message: string, param1: unknown, param2?: number) {
+    public exception(message: string, statusCode?: number): Exception
+    public exception(message: string, error?:any, statusCode?: number): Exception
+    public exception(message: string, param1?: unknown, param2?: number) {
         const statusCode = (typeof (param1) === 'number') ? param1 : param2;
         const error = (typeof (param1) !== 'number') ? param1 : undefined;
         return new Exception(this._moduleName, message, error, statusCode);

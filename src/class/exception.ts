@@ -42,6 +42,7 @@ export class Exception {
             this._error._type === this._type) {
             errorDesc = `\n- ${this._error}` || '';
         }
-        return `${this.name}Error: ${this.message} (${this._errorId})${errorDesc}`
+        const statusCode = this._statusCode ? `Server Error ${this.statusCode} - ` : '';
+        return `${statusCode}${this.name}Error: ${this.message} (${this._errorId})${errorDesc}`
     }
 }
