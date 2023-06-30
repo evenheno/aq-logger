@@ -5,7 +5,7 @@ import { activeModules, moduleColors, platform } from '../global/const';
 import { ensureArray } from '../global/utils';
 
 class AQLogger<T extends string> {
-    
+
     private _parent?: AQLogger<T>;
     private _moduleName: string;
     private _printTs: boolean;
@@ -15,11 +15,13 @@ class AQLogger<T extends string> {
         this._moduleName = moduleName;
         this._parent = parent;
         this._printTs = true;
-        this.logLevel = { all: true };
+        this.logLevel = {};
         this._setModules();
         //Initiate logger's log levels
         const logLevelArr = ensureArray<TLogLevel<T>>(logLevel);
-        if (logLevel) { this.enableLogLevel(...logLevelArr) }
+        if (logLevel) {
+            this.enableLogLevel(...logLevelArr)
+        }
     }
 
     public enableLogLevel(...logLevels: TLogLevelArr<T>) {
@@ -90,20 +92,19 @@ class AQLogger<T extends string> {
     }
 
     private _resolve(param1?: TLogLevelParam<T> | object, param2?: object) {
-        const logLevels : TLogLevelArr<T> = ['all', ...ensureArray<TLogLevel<T>>(param1)];
+        const logLevles = ensureArray<TLogLevel<T>>(param1 || []);
+        logLevles.push('all');
         const data = ((typeof param1 === 'object') ? param1 : undefined);
-        if (!logLevels) { return { data, allowPrint: true } }
-        //Check if log is allowed according to module log level and global log level
-
-        for (let logLevel of logLevels) {
-            const allowLocal = this.logLevel[logLevel] === true;
-            const allowGlobal = this._parent?.logLevel[logLevel] === true;
-            if (allowGlobal && allowLocal) {
-                return { data, allowPrint: true }
+        for (let key in this.logLevel) {
+            logLevles.push(key as TLogLevel<T>);
+        }
+        for (let logLevel of logLevles) {
+            const localRule = this.logLevel[logLevel];
+            const globalRule = this._parent?.logLevel[logLevel];
+            if ((localRule == null || localRule === true) && globalRule === true) {
+                return { data: data, allowPrint: true }
             }
         };
-
-        //Log is not allowed to be printed, return false
         return { allowPrint: false };
     }
 
@@ -208,7 +209,6 @@ class AQLogger<T extends string> {
 class AQGlobalLogger<T extends string> extends AQLogger<T>{
     public constructor(...logLevel: TLogLevelArr<T>) {
         super('AQGlobalLogger');
-        this.logLevel = { all: true }
         this.enableLogLevel(...logLevel);
     }
     public create(moduleName: string, logLevel?: TLogLevelParam<T>) {
