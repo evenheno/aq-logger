@@ -9,8 +9,7 @@ export interface colorsDictionary {
     [key: string]: Array<TColor>;
 }
 
-export type TLogLevel =
-    'uiLogic' | 'bLogic' | 'daLogic' |
-    'dbLogic' | 'apiLogic' | 'sysLogic' |
-    'fsLogic' | 'dev' | 'staging' | 'prod'
-;
+export type TDefaultLogLevel = 'all';
+export type TLogLevel<T> = TDefaultLogLevel | T;
+export type TLogLevelArr<T> = Array<TLogLevel<T>>
+export type TLogLevelParam<T> = TLogLevel<T> | TLogLevelArr<T>;

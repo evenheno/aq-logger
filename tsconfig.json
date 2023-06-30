@@ -7,7 +7,9 @@
         "esModuleInterop": true,
         "sourceMap": true,
         "declaration": true,
-        "declarationDir": "./dist/types"
+        "declarationDir": "./dist/types",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "include": [
         "./src/**/*"
