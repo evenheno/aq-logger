@@ -1,5 +1,3 @@
-
-
 export enum ENodeColors {
     fgBlack = "\x1b[30m",
     fgRed = "\x1b[31m",

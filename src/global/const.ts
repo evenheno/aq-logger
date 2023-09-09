@@ -13,4 +13,6 @@ export const moduleColors: Array<Array<TColor>> = [
 export const platform: TPlatform =
     typeof window === 'undefined' ? 'NodeJS' : 'Browser';
 
-export const activeModules: colorsDictionary = {};
+export const activeModules: colorsDictionary = {
+    
+};
