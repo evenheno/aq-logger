@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es5",
         "module": "commonjs",
         "outDir": "./dist",
         "strict": true,
@@ -9,7 +9,8 @@
         "declaration": true,
         "declarationDir": "./dist/types",
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "lib": ["es6", "dom", "es2017"]
     },
     "include": [
         "./src/**/*"
