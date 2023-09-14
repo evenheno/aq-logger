@@ -6,10 +6,12 @@
     "type": "commonjs",
     "scripts": {
         "build": "node scripts/pre-build && tsc && node scripts/post-build",
-        "build:publish": "npm run build && cd dist && npm publish",
-        "build:test": "npm run build && node dist/test",
-        "start": "cd build && node .",
-        "build:start": "npm run build && npm run start"
+        "start": "cd dist && node .",
+        "test": "cd dist && node test",
+        "build:test": "npm run build && npm run test",
+        "build:start": "npm run build && npm run start",
+        "build:publish": "npm run build && cd dist && npm publish"
+
     },
     "author": "Aquarius Systems Inc.",
     "license": "ISC",

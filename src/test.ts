@@ -1,26 +1,26 @@
 import { AQGlobalLogger } from "./class/aq-global-logger";
 import { TAQLoggerDefaultEnv, TAQLoggerDefaultLogLevel } from "./global/types";
 
-type TEnv = 'devVerbose'
-type TModules = 'Main' | 'UI';
+type TModules = 'server' | 'ui';
 
-const globalLogger = new AQGlobalLogger<TEnv, TAQLoggerDefaultLogLevel, TModules>({
-    environment: 'devVerbose',
-    printTimestamp: true,
-    printLogLevel: true,
-    printModuleName: true,
+const globalLogger = new AQGlobalLogger<TAQLoggerDefaultEnv, TAQLoggerDefaultLogLevel, TModules>({
+    environment: 'production',
     rules: {
-        development: { logLevel: '*', modules: '*' },
-        devVerbose: { logLevel: '*', modules: '*' },
-        production: { logLevel: ['error'], modules: '*' }
+        development: {
+            print: '*',
+            logLevel: '*', modules: {
+                server: { logLevel: '*' }
+            }
+        },
+        production: {
+            print: '*',
+            logLevel: '*', modules: {
+                server: { logLevel: '*' }
+            }
+        }
     }
 });
 
-const uiLogger = globalLogger.create('UI')
-const mainLogger = globalLogger.create('Main');
+const logger = globalLogger.create('server');
 
-uiLogger.debug('Hello from UI');
-mainLogger.debug('Hello from Main');
-
-uiLogger.error('Error from UI');
-mainLogger.error('Error from Main');
+logger.info('Hello from server', { ts: Date.now() });

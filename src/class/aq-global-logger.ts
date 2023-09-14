@@ -1,5 +1,4 @@
 import {
-    TAQGlobalLoggerOptions,
     TAQLoggerOptions,
     TAQLoggerDefaultEnv,
     TAQLoggerDefaultLogLevel,
@@ -12,19 +11,14 @@ class AQGlobalLogger<
     TCLogLevel extends string = TAQLoggerDefaultLogLevel,
     TCModule extends string = TAQLoggerDefaultModule> {
 
-    private _loggerOptions?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>;
+    private _options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>;
+    public get options() { return this._options }
 
-    public constructor(options?: TAQGlobalLoggerOptions<TCEnv, TCLogLevel, TCModule>) {
-        this._loggerOptions = {
-            environment: options?.environment,
-            printTimestamp: options?.printTimestamp,
-            printLogLevel: options?.printLogLevel,
-            printModuleName: options?.printModuleName,
-            rules: options?.rules
-        }
+    public constructor(options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>) {
+        this._options = options;
     }
     public create(module: TCModule | TAQLoggerDefaultModule) {
-        return new AQLogger(module, this._loggerOptions);
+        return new AQLogger(module, this._options);
     }
 }
 
