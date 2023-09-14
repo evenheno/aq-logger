@@ -1,6 +1,6 @@
 import {
     TAQLoggerOptions, TAQLoggerRulesSet, TColor, TAQLoggerDefaultEnv,
-    TAQLoggerDefaultLogLevel, TAQLoggerDefaultModule, TPrintOptions
+    TAQLoggerDefaultLogLevel, TAQLoggerDefaultModule, TPrintOptions, TModuleOptions
 } from '../global/types';
 import { ENodeColors, EWebColors } from '../global/enums';
 import { activeModules, moduleColors, platform } from '../global/const';
@@ -106,59 +106,51 @@ class AQLogger<
 
     private _allowLog(logLevel: TAQLoggerDefaultLogLevel): TPrintOptions | undefined {
 
-        const defaultOptions: TPrintOptions = {
-            data: true,
-            logLevel: true,
-            moduleName: true,
-            timestamp: true
+        let printOptions: TPrintOptions = {
+            data: true, logLevel: true,
+            moduleName: true, timestamp: true
         }
 
-        let printOptions: TPrintOptions = this._options?.print && this._options.print != '*' ?
-            this._options.print : defaultOptions;
+        if (this._options?.print) {
+            printOptions = { ...printOptions, ...this._options.print }
+        }
 
-        if (!this._rules || this._rules === '*') { return printOptions; }
+        if (!this._rules) { return printOptions; }
         if (!this?._options?.environment) { return printOptions; }
 
-        const rules = this._rules[this._options?.environment];
+        const envRules = this._rules[this._options?.environment];
+        if (!envRules) { return printOptions; }
 
-        if (!rules) { return }
-        if (rules === '*') { return printOptions; }
-
-        if (rules.print && rules.print != '*') {
-            printOptions = { ...printOptions, ...rules.print }
+        if (envRules.print) {
+            printOptions = { ...printOptions, ...envRules.print }
         }
 
-        let allowModule = false;
         let allowLogLevel = false;
         let allowModuleLogLevel = false;
 
-        if (rules.modules === '*') { return printOptions }
-
-        if (!rules.modules) { return printOptions }
-
-        const moduleMeta = rules.modules[this._module];
-
-        if (!moduleMeta || moduleMeta === '*') {
-            allowModule = true;
-            allowModuleLogLevel = true;
-        } else {
-            allowModule = defTrue(moduleMeta.allow);
-            if (moduleMeta.logLevel == undefined ||
-                moduleMeta.logLevel === '*' ||
-                moduleMeta.logLevel.includes(logLevel)) {
-                if (moduleMeta.print != null && moduleMeta.print !== '*') {
-                    printOptions = { ...printOptions, ...moduleMeta.print };
-                }
+        //Process module configuration
+        if (envRules.modules) {
+            const moduleOptions = envRules.modules[this._module];
+            if (!moduleOptions) {
                 allowModuleLogLevel = true;
+            } else {
+                allowModuleLogLevel = defTrue(moduleOptions.allow);
+                if (!moduleOptions.logLevel || moduleOptions.logLevel[logLevel] === true) {
+                    if (moduleOptions.print) {
+                        printOptions = { ...printOptions, ...moduleOptions.print };
+                    }
+                    allowModuleLogLevel = true;
+                }
             }
+        } else {
+            allowModuleLogLevel = true;
         }
-        if (!allowModule) { return }
 
-        if (rules.logLevel) {
-            const allowAllLevels = rules.logLevel === '*';
-            if (allowAllLevels || rules.logLevel.includes(logLevel)) {
-                allowLogLevel = true;
-            }
+        //Process module's log level configurations
+        if (!envRules.logLevel) {
+            allowLogLevel = true;
+        } else if (envRules.logLevel[logLevel] === true) {
+            allowLogLevel = true;
         }
 
         if (allowLogLevel && allowModuleLogLevel) {
@@ -169,15 +161,6 @@ class AQLogger<
     private _log(logLevel: TAQLoggerDefaultLogLevel, message: string, colors: TColor[], ...data: any[]) {
         let printOptions = this._allowLog(logLevel);
         if (!printOptions) { return }
-
-        if (printOptions === '*') {
-            printOptions = {
-                data: true,
-                logLevel: true,
-                moduleName: true,
-                timestamp: true
-            }
-        }
 
         const browserStyle: Array<string> = [];
         const moduleColor = activeModules[this._module as string];

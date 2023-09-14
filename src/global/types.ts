@@ -9,24 +9,29 @@ export interface colorsDictionary {
     [key: string]: Array<TColor>;
 }
 
-type TModuleOptions<TCModule extends string, TCLogLevel extends string> = '*' | {
-    [key in TAQLoggerDefaultModule | TCModule]?: '*' | {
-        allow?: boolean;
-        logLevel?: '*' | Array<TAQLoggerDefaultLogLevel | TCLogLevel>;
-        print?: TPrintOptions;
-    };
+export type TLogLevelMap<TCLogLevel extends string> = {
+    [key in TCLogLevel]?: boolean;
 };
 
-type TLogLevelList<TCLogLevel> = '*' | Array<TAQLoggerDefaultLogLevel | TCLogLevel>
+export type TModuleOptions<TCLogLevel extends string> = {
+    allow?: boolean;
+    logLevel?: TLogLevelMap<TCLogLevel | TAQLoggerDefaultLogLevel>;
+    print?: TPrintOptions;
+};
+
+export type TModulesMap<TCModule extends string, TCLogLevel extends string> = {
+    [key in TAQLoggerDefaultModule | TCModule]?: TModuleOptions<TCLogLevel>;
+};
+
 
 export type TAQLoggerRulesSet<
     TCEnv extends string = TAQLoggerDefaultEnv,
     TCLogLevel extends string = TAQLoggerDefaultLogLevel,
-    TCModule extends string = TAQLoggerDefaultModule> = '*' | {
-        [key in TAQLoggerDefaultEnv | TCEnv]?: '*' | {
-            logLevel?: TLogLevelList<TCLogLevel>;
-            modules?: TModuleOptions<TCModule, TCLogLevel>;
-            print?: '*' | TPrintOptions;
+    TCModule extends string = TAQLoggerDefaultModule> = {
+        [key in TAQLoggerDefaultEnv | TCEnv]?: {
+            logLevel?: TLogLevelMap<TCLogLevel | TAQLoggerDefaultLogLevel>;
+            print?: TPrintOptions;
+            modules?: TModulesMap<TCModule, TCLogLevel>;
         };
     };
 
@@ -43,7 +48,7 @@ export type TAQLoggerOptions<
     TCModule extends string = TAQLoggerDefaultModule> = {
         environment?: TCEnv | TAQLoggerDefaultEnv,
         rules?: TAQLoggerRulesSet<TCEnv, TCLogLevel, TCModule>,
-        print?: '*' | TPrintOptions
+        print?: TPrintOptions
     }
 
 export type TAQLoggerDefaultModule =

@@ -6,21 +6,14 @@ type TModules = 'server' | 'ui';
 const globalLogger = new AQGlobalLogger<TAQLoggerDefaultEnv, TAQLoggerDefaultLogLevel, TModules>({
     environment: 'production',
     rules: {
-        development: {
-            print: '*',
-            logLevel: '*', modules: {
-                server: { logLevel: '*' }
-            }
-        },
         production: {
-            print: '*',
-            logLevel: '*', modules: {
-                server: { logLevel: '*' }
+            print: { data: false },
+            modules: {
+                server: {allow: false}
             }
         }
     }
 });
 
 const logger = globalLogger.create('server');
-
 logger.info('Hello from server', { ts: Date.now() });
