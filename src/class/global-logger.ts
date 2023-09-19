@@ -3,8 +3,8 @@ import {
     TAQLoggerDefaultEnv,
     TAQLoggerDefaultLogLevel,
     TAQLoggerDefaultModule
-} from "../global/types";
-import { AQLogger } from "./aq-logger";
+} from "../types/types.js";
+import { AQLogger } from "./logger.js";
 
 class AQGlobalLogger<
     TCEnv extends string = TAQLoggerDefaultEnv,

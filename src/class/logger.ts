@@ -1,11 +1,11 @@
 import {
     TAQLoggerOptions, TAQLoggerRulesSet, TColor, TAQLoggerDefaultEnv,
-    TAQLoggerDefaultLogLevel, TAQLoggerDefaultModule, TPrintOptions, TModuleOptions
-} from '../global/types';
-import { ENodeColors, EWebColors } from '../global/enums';
-import { activeModules, moduleColors, platform } from '../global/const';
-import { Exception } from './exception';
-import { AQGlobalLogger } from './aq-global-logger';
+    TAQLoggerDefaultLogLevel, TAQLoggerDefaultModule, TPrintOptions, TLogOptions
+} from '../types/types.js';
+import { ENodeColors, EWebColors } from '../enum/enum.js';
+import { activeModules, moduleColors, platform } from '../const/const.js';
+import { Exception } from './exception.js';
+import { AQGlobalLogger } from './global-logger.js';
 
 const defTrue = (value?: boolean) => {
     return value === false ? false : true;
@@ -105,10 +105,11 @@ class AQLogger<
     }
 
     private _allowLog(logLevel: TAQLoggerDefaultLogLevel): TPrintOptions | undefined {
-
         let printOptions: TPrintOptions = {
-            data: true, logLevel: true,
-            moduleName: true, timestamp: true
+            data: true,
+            logLevel: true,
+            moduleName: true,
+            timestamp: true
         }
 
         if (this._options?.print) {
@@ -121,41 +122,22 @@ class AQLogger<
         const envRules = this._rules[this._options?.environment];
         if (!envRules) { return printOptions; }
 
-        if (envRules.print) {
-            printOptions = { ...printOptions, ...envRules.print }
-        }
+        if (envRules.print) { printOptions = { ...printOptions, ...envRules.print } }
+        if (!envRules.modules) { return printOptions; }
 
-        let allowLogLevel = false;
-        let allowModuleLogLevel = false;
+        const moduleOptions = envRules.modules[this._module];
+        if (!moduleOptions) { return printOptions; }
+        if (!defTrue(moduleOptions.allow)) { return; }
 
-        //Process module configuration
-        if (envRules.modules) {
-            const moduleOptions = envRules.modules[this._module];
-            if (!moduleOptions) {
-                allowModuleLogLevel = true;
-            } else {
-                allowModuleLogLevel = defTrue(moduleOptions.allow);
-                if (!moduleOptions.logLevel || moduleOptions.logLevel[logLevel] === true) {
-                    if (moduleOptions.print) {
-                        printOptions = { ...printOptions, ...moduleOptions.print };
-                    }
-                    allowModuleLogLevel = true;
-                }
-            }
-        } else {
-            allowModuleLogLevel = true;
-        }
+        if (moduleOptions.print) { printOptions = { ...printOptions, ...moduleOptions.print }; }
+        
+        if (!envRules.logLevel) { return printOptions; }
+        if (!defTrue(envRules.logLevel[logLevel])) { return; }
 
-        //Process module's log level configurations
-        if (!envRules.logLevel) {
-            allowLogLevel = true;
-        } else if (envRules.logLevel[logLevel] === true) {
-            allowLogLevel = true;
-        }
+        if(!moduleOptions.logLevel){ return printOptions }
+        if (!defTrue(moduleOptions.logLevel[logLevel])) { return; }
 
-        if (allowLogLevel && allowModuleLogLevel) {
-            return printOptions;
-        }
+        return printOptions;
     }
 
     private _log(logLevel: TAQLoggerDefaultLogLevel, message: string, colors: TColor[], ...data: any[]) {

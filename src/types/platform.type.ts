@@ -1,0 +1,1 @@
+export type TPlatform = 'Browser' | 'NodeJS';

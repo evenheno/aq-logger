@@ -1,5 +1,5 @@
-import { AQGlobalLogger } from "./class/aq-global-logger";
-import { TAQLoggerDefaultEnv, TAQLoggerDefaultLogLevel } from "./global/types";
+import { AQGlobalLogger } from "./class/global-logger";
+import { TAQLoggerDefaultEnv, TAQLoggerDefaultLogLevel } from "./types/types.js";
 
 type TModules = 'server' | 'ui';
 
@@ -9,11 +9,14 @@ const globalLogger = new AQGlobalLogger<TAQLoggerDefaultEnv, TAQLoggerDefaultLog
         production: {
             print: { data: false },
             modules: {
-                server: {allow: false}
+                server: { allow: true, logLevel: { debug: false} },
+                ui: { allow: true }
             }
         }
     }
 });
 
-const logger = globalLogger.create('server');
-logger.info('Hello from server', { ts: Date.now() });
+const serverLogger = globalLogger.create('server');
+const uiLogger = globalLogger.create('ui');
+serverLogger.debug('Hello from Server', { ts: Date.now() });
+uiLogger.debug('Hello from UI', { ts: Date.now() });

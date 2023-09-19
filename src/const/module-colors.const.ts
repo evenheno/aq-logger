@@ -1,4 +1,4 @@
-import { TColor, TPlatform, colorsDictionary } from "./types";
+import { TColor } from "../types/types.js";
 
 export const moduleColors: Array<Array<TColor>> = [
     ['bgCyan', 'fgBlack', 'bright'],
@@ -9,10 +9,3 @@ export const moduleColors: Array<Array<TColor>> = [
     ['bgBlue', 'fgWhite', 'bright'],
     ['bgWhite', 'fgBlack', 'bright']
 ];
-
-export const platform: TPlatform =
-    typeof window === 'undefined' ? 'NodeJS' : 'Browser';
-
-export const activeModules: colorsDictionary = {
-    
-};
