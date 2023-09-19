@@ -5,6 +5,6 @@ export function generateId(length: number = 10) {
     return id;
 }
 
-export function ensureArray<T>(obj: any | Array<any>) : Array<T>{
+export function ensureArray<T>(obj: any | Array<any>): Array<T> {
     return (Array.isArray(obj) ? obj : [obj]) as Array<T>;
 }

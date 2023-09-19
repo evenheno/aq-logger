@@ -22,7 +22,7 @@ class AQLogger<
     private _options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>;
 
     constructor(
-        module: TCModule | TAQLoggerDefaultModule,
+        module: TCModule | TAQLoggerDefaultModule = 'system',
         options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>,
         parent?: AQGlobalLogger) {
         this._options = options;
@@ -150,15 +150,16 @@ class AQLogger<
         const logMessage = [];
         if (printOptions.timestamp === true) {
             const ts = new Date().toLocaleString();
-            logMessage.push(this._paint(`[${ts}] `, ['dim'], browserStyle));
-        }
-        if (printOptions.moduleName === true) {
-            logMessage.push(this._paint(` ${this._module} `.padEnd(13), moduleColor, browserStyle), ' ');
+            logMessage.push(this._paint(`${ts} `, ['dim'], browserStyle));
         }
         if (printOptions.logLevel === true) {
             logMessage.push(this._paint(`[${(logLevel as string).toUpperCase()}] `.padEnd(8), ['bright'], browserStyle))
         }
-        logMessage.push(this._paint(message, colors, browserStyle));
+        if (printOptions.moduleName === true) {
+            logMessage.push(this._paint(` ${this._module} `.padEnd(13), moduleColor, browserStyle), ' ');
+        }
+
+        logMessage.push(this._paint(` ${message} `, colors, browserStyle));
 
         const outputMessage = logMessage.join('');
         const outputData = [...browserStyle];
