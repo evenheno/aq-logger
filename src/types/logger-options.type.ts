@@ -8,5 +8,6 @@ export type TAQLoggerOptions<
     TCModule extends string = TAQLoggerDefaultModule> = {
         environment?: TCEnv | TAQLoggerDefaultEnv,
         rules?: TAQLoggerRulesSet<TCEnv, TCLogLevel, TCModule>,
-        print?: TPrintOptions
+        print?: TPrintOptions,
+        subModule?: string
     }

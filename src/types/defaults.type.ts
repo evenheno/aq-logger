@@ -1,5 +1,5 @@
 export type TAQLoggerDefaultModule =
-    | 'system';
+    | 'System';
 
 export type TAQLoggerDefaultEnv =
     | 'development'

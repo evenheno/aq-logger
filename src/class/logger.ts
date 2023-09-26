@@ -1,11 +1,16 @@
 import {
-    TAQLoggerOptions, TAQLoggerRulesSet, TColor, TAQLoggerDefaultEnv,
-    TAQLoggerDefaultLogLevel, TAQLoggerDefaultModule, TPrintOptions, TLogOptions
+    TAQLoggerOptions,
+    TAQLoggerRulesSet,
+    TColor,
+    TAQLoggerDefaultEnv,
+    TAQLoggerDefaultLogLevel,
+    TAQLoggerDefaultModule,
+    TPrintOptions
 } from '../types/types.js';
+
 import { ENodeColors, EWebColors } from '../enum/enum.js';
 import { activeModules, moduleColors, platform } from '../const/const.js';
 import { Exception } from './exception.js';
-import { AQGlobalLogger } from './global-logger.js';
 
 const defTrue = (value?: boolean) => {
     return value === false ? false : true;
@@ -17,18 +22,17 @@ class AQLogger<
     TCModule extends string = TAQLoggerDefaultModule>{
 
     private _module: TCModule | TAQLoggerDefaultModule;
-    private _parent?: AQGlobalLogger;
+    private _subModule?: string;
     private _rules?: TAQLoggerRulesSet<TCEnv, TCLogLevel, TCModule>;
     private _options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>;
 
     constructor(
-        module: TCModule | TAQLoggerDefaultModule = 'system',
-        options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>,
-        parent?: AQGlobalLogger) {
+        module: TCModule | TAQLoggerDefaultModule,
+        options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>) {
         this._options = options;
         this._rules = options?.rules;
         this._module = module;
-        this._parent = parent;
+        this._subModule = options?.subModule;
         this._setModules();
     }
 
@@ -109,7 +113,8 @@ class AQLogger<
             data: true,
             logLevel: true,
             moduleName: true,
-            timestamp: true
+            timestamp: false,
+            subModule: true
         }
 
         if (this._options?.print) {
@@ -130,11 +135,11 @@ class AQLogger<
         if (!defTrue(moduleOptions.allow)) { return; }
 
         if (moduleOptions.print) { printOptions = { ...printOptions, ...moduleOptions.print }; }
-        
+
         if (!envRules.logLevel) { return printOptions; }
         if (!defTrue(envRules.logLevel[logLevel])) { return; }
 
-        if(!moduleOptions.logLevel){ return printOptions }
+        if (!moduleOptions.logLevel) { return printOptions }
         if (!defTrue(moduleOptions.logLevel[logLevel])) { return; }
 
         return printOptions;
@@ -148,19 +153,21 @@ class AQLogger<
         const moduleColor = activeModules[this._module as string];
 
         const logMessage = [];
-        if (printOptions.timestamp === true) {
+        if (defTrue(printOptions.timestamp)) {
             const ts = new Date().toLocaleString();
             logMessage.push(this._paint(`${ts} `, ['dim'], browserStyle));
         }
-        if (printOptions.logLevel === true) {
-            logMessage.push(this._paint(`[${(logLevel as string).toUpperCase()}] `.padEnd(8), ['bright'], browserStyle))
+        if (defTrue(printOptions.logLevel)) {
+            const str = `${`[${(logLevel as string)}]`.toUpperCase().slice(0,7).padEnd(8)}`;
+            logMessage.push(this._paint(str, ['bright'], browserStyle))
         }
-        if (printOptions.moduleName === true) {
-            logMessage.push(this._paint(` ${this._module} `.padEnd(13), moduleColor, browserStyle), ' ');
+        if (defTrue(printOptions.moduleName)) {
+            logMessage.push(this._paint(` @${this._module.slice(0,9).padEnd(10)}`, moduleColor, browserStyle), ' ');
         }
-
-        logMessage.push(this._paint(` ${message} `, colors, browserStyle));
-
+        if (defTrue(printOptions.subModule)) {
+            logMessage.push(this._paint(`${this._subModule}`.slice(0,9).padEnd(10),['fgBlue'], browserStyle), ' ');
+        }
+        logMessage.push(this._paint(`${message}`, colors, browserStyle));
         const outputMessage = logMessage.join('');
         const outputData = [...browserStyle];
         if (printOptions.data === true) {
@@ -168,8 +175,6 @@ class AQLogger<
         }
         console.log(outputMessage, ...outputData);
     }
-
-
 }
 
 export { AQLogger }

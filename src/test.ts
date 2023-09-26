@@ -1,9 +1,16 @@
 import { AQGlobalLogger } from "./class/global-logger";
-import { AQLogger } from "./class/logger";
-import { TAQLoggerDefaultEnv, TAQLoggerDefaultLogLevel } from "./types/types.js";
+const globalLogger = new AQGlobalLogger({
+    environment: 'development',
+    rules: {
+        development: {
+            modules: {
+                DB: {
+                    print: {timestamp: true}
+                }
+            }
+        }
+    }
+});
 
-type TModules = 'server' | 'ui';
-
-const logger = new AQLogger();
-
-logger.warn('Warning')
+const logger = globalLogger.create('DB', 'Test.ts');
+logger.success('AQLogger is OK');

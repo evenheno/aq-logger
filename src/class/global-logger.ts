@@ -7,9 +7,9 @@ import {
 import { AQLogger } from "./logger.js";
 
 class AQGlobalLogger<
-    TCEnv extends string = TAQLoggerDefaultEnv,
-    TCLogLevel extends string = TAQLoggerDefaultLogLevel,
-    TCModule extends string = TAQLoggerDefaultModule> {
+    TCEnv extends string = string,
+    TCLogLevel extends string = string,
+    TCModule extends string = string> {
 
     private _options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>;
     public get options() { return this._options }
@@ -17,8 +17,8 @@ class AQGlobalLogger<
     public constructor(options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>) {
         this._options = options;
     }
-    public create(module: TCModule | TAQLoggerDefaultModule) {
-        return new AQLogger(module, this._options);
+    public create(module: TCModule | TAQLoggerDefaultModule, subModule?: string) {
+        return new AQLogger(module, { ...this._options, subModule: subModule });
     }
 }
 
