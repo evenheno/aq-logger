@@ -1,4 +1,5 @@
 import { AQGlobalLogger } from "./class/global-logger";
+
 const globalLogger = new AQGlobalLogger({
     environment: 'development',
     rules: {
@@ -6,11 +7,23 @@ const globalLogger = new AQGlobalLogger({
             modules: {
                 DB: {
                     print: {timestamp: true}
+                },
+                Controller: {
+                    
                 }
             }
         }
     }
 });
 
-const logger = globalLogger.create('DB', 'Test.ts');
-logger.success('AQLogger is OK');
+const logger = globalLogger.create(
+        'Controller',
+        'UserController');
+        
+const logger2 = globalLogger.create(
+        'Controller',
+        'UserController');
+        
+        
+logger.success('AQLogger1 is OK');
+logger.success('Lo')

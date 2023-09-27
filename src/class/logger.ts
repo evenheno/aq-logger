@@ -109,6 +109,7 @@ class AQLogger<
     }
 
     private _allowLog(logLevel: TAQLoggerDefaultLogLevel): TPrintOptions | undefined {
+        
         let printOptions: TPrintOptions = {
             data: true,
             logLevel: true,
@@ -156,23 +157,29 @@ class AQLogger<
         if (defTrue(printOptions.timestamp)) {
             const ts = new Date().toLocaleString();
             logMessage.push(this._paint(`${ts} `, ['dim'], browserStyle));
-        }
+        };
+        
         if (defTrue(printOptions.logLevel)) {
             const str = `${`[${(logLevel as string)}]`.toUpperCase().slice(0,7).padEnd(8)}`;
             logMessage.push(this._paint(str, ['bright'], browserStyle))
-        }
+        };
+        
         if (defTrue(printOptions.moduleName)) {
-            logMessage.push(this._paint(` @${this._module.slice(0,9).padEnd(10)}`, moduleColor, browserStyle), ' ');
-        }
+            logMessage.push(this._paint(`${this._module.slice(0,9).padEnd(10)}`, moduleColor, browserStyle), ' ');
+        };
+        
         if (defTrue(printOptions.subModule)) {
-            logMessage.push(this._paint(`${this._subModule}`.slice(0,9).padEnd(10),['fgBlue'], browserStyle), ' ');
-        }
-        logMessage.push(this._paint(`${message}`, colors, browserStyle));
+            logMessage.push(this._paint(`${this._subModule}`.slice(0,9).padEnd(10),['fgYellow'], browserStyle), ' ');
+        };
+       
+        logMessage.push(this._paint(`\n${message}\n`, colors, browserStyle));
         const outputMessage = logMessage.join('');
         const outputData = [...browserStyle];
+        
         if (printOptions.data === true) {
             outputData.push(...data);
-        }
+        };
+        
         console.log(outputMessage, ...outputData);
     }
 }
