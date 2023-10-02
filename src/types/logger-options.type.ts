@@ -1,3 +1,4 @@
+import { TColorsMap } from "./colors.type.js"
 import { TAQLoggerDefaultEnv, TAQLoggerDefaultLogLevel, TAQLoggerDefaultModule } from "./defaults.type.js"
 import { TPrintOptions } from "./print-options.type.js"
 import { TAQLoggerRulesSet } from "./rules-set.type.js"
@@ -9,5 +10,7 @@ export type TAQLoggerOptions<
         environment?: TCEnv | TAQLoggerDefaultEnv,
         rules?: TAQLoggerRulesSet<TCEnv, TCLogLevel, TCModule>,
         print?: TPrintOptions,
-        subModule?: string
+        subModule?: string,
+        moduleColors?: TColorsMap<TCModule | TAQLoggerDefaultModule>
+        logLevelColors?: TColorsMap<TCLogLevel | TAQLoggerDefaultLogLevel>
     }

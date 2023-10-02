@@ -1,16 +1,17 @@
 import {
     TAQLoggerOptions,
     TAQLoggerRulesSet,
-    TColor,
+    TColors,
     TAQLoggerDefaultEnv,
     TAQLoggerDefaultLogLevel,
     TAQLoggerDefaultModule,
-    TPrintOptions
+    TColor,
+    getColor,
 } from '../types/types.js';
-
-import { ENodeColors, EWebColors } from '../enum/enum.js';
-import { activeModules, moduleColors, platform } from '../const/const.js';
+import { platform } from '../const/const.js';
 import { Exception } from './exception.js';
+import { getTs } from '../global/utils.js';
+import { TLogLevelPermission } from '../types/log-level-permissions.js';
 
 const defTrue = (value?: boolean) => {
     return value === false ? false : true;
@@ -33,36 +34,18 @@ class AQLogger<
         this._rules = options?.rules;
         this._module = module;
         this._subModule = options?.subModule;
-        this._setModules();
     }
 
-    private _getColor(key: TColor) {
-        if (platform === 'NodeJS') {
-            return ENodeColors[key];
-        } else if (platform === 'Browser') {
-            return EWebColors[key];
-        } else {
-            throw `Unsupported platform: ${platform}`
-        }
-    }
-
-    private _setModules() {
-        if (!activeModules[this._module]) {
-            const index = Object.keys(activeModules).length % moduleColors.length;
-            let dictionary: typeof ENodeColors | typeof EWebColors;
-            if (platform === 'NodeJS') {
-                dictionary = ENodeColors;
-            } else if (platform === 'Browser') {
-                dictionary = EWebColors;
-            } else { throw `Unsupported platform: ${platform}` }
-            activeModules[this._module] = moduleColors[index];
-        }
+    private _getColors(colors: TColor[]) {
+        const result: string[] = [];
+        for (let color of colors) { result.push(getColor(color)) }
+        return result.join('')
     }
 
     private _paint(text: string, colors: TColor[], browserStyles: string[]) {
-        const strColors = colors.map(color => this._getColor(color)).join('');
+        const strColors = this._getColors(colors);
         if (platform === 'NodeJS') {
-            return `${strColors}${text}${ENodeColors.reset}`;
+            return `${strColors}${text}${getColor('reset')}`;
         } else if (platform === 'Browser') {
             browserStyles.push(strColors);
             return `%c${text}`;
@@ -72,31 +55,31 @@ class AQLogger<
     }
 
     public log(logLevel: TAQLoggerDefaultLogLevel, text: string, ...data: any[]) {
-        this._log(logLevel, text, ['fgWhite'], ...data);
+        this._log(logLevel, text, text, ['fgWhite'], ...data);
     }
 
     public debug(text: string, ...data: any[]) {
-        this._log('debug', text, ['fgMagenta'], ...data);
+        this._log('debug', text, text, ['fgMagenta'], ...data);
     }
 
     public action(text: string, ...data: any[]) {
-        this._log('debug', `${text}...`, ['fgYellow'], ...data);
+        this._log('debug', `${text}...`, text, ['fgYellow'], ...data);
     }
 
     public success(text: string, ...data: any[]) {
-        this._log('info', text, ['fgGreen'], ...data);
+        this._log('info', text, text, ['fgGreen'], ...data);
     }
 
     public info(text: string, ...data: any[]) {
-        this._log('info', `${text}...`, ['fgCyan'], ...data);
+        this._log('info', `${text}...`, text, ['fgCyan'], ...data);
     }
 
     public error(error: any, ...data: any[]) {
-        this._log('error', `${error}`, ['bgRed', 'fgWhite'], ...data);
+        this._log('error', `${error}`, error, ['bgRed', 'fgWhite'], ...data);
     }
 
     public warn(text: string, ...data: any[]) {
-        this._log('warn', text, ['bgYellow', 'fgBlack'], ...data);
+        this._log('warn', text, text, ['bgYellow', 'fgBlack'], ...data);
     }
 
     public exception(message: string, error?: any) {
@@ -108,79 +91,97 @@ class AQLogger<
         throw new Exception(this._module, message, error);
     }
 
-    private _allowLog(logLevel: TAQLoggerDefaultLogLevel): TPrintOptions | undefined {
-        
-        let printOptions: TPrintOptions = {
-            data: true,
-            logLevel: true,
-            moduleName: true,
-            timestamp: false,
-            subModule: true
+    private _getLogLevelPermission(logLevel: TAQLoggerDefaultLogLevel): TLogLevelPermission | undefined {
+
+        const result: TLogLevelPermission = {
+            printOptions: {
+                data: true,
+                logLevel: true,
+                moduleName: true,
+                timestamp: true,
+                subModule: true
+            }
         }
 
         if (this._options?.print) {
-            printOptions = { ...printOptions, ...this._options.print }
+            result.printOptions = { ...result.printOptions, ...this._options.print }
         }
 
-        if (!this._rules) { return printOptions; }
-        if (!this?._options?.environment) { return printOptions; }
+        if (!this._rules) { return result; }
+        if (!this?._options?.environment) { return result; }
 
         const envRules = this._rules[this._options?.environment];
-        if (!envRules) { return printOptions; }
+        if (!envRules) { return result; }
 
-        if (envRules.print) { printOptions = { ...printOptions, ...envRules.print } }
-        if (!envRules.modules) { return printOptions; }
+        if (envRules.print) { result.printOptions = { ...result.printOptions, ...envRules.print } }
+        if (!envRules.modules) { return result; }
 
         const moduleOptions = envRules.modules[this._module];
-        if (!moduleOptions) { return printOptions; }
+        if (!moduleOptions) { return result; }
         if (!defTrue(moduleOptions.allow)) { return; }
 
-        if (moduleOptions.print) { printOptions = { ...printOptions, ...moduleOptions.print }; }
+        if (moduleOptions.print) { result.printOptions = { ...result.printOptions, ...moduleOptions.print }; }
 
-        if (!envRules.logLevel) { return printOptions; }
+        if (!envRules.logLevel) { return result; }
         if (!defTrue(envRules.logLevel[logLevel])) { return; }
 
-        if (!moduleOptions.logLevel) { return printOptions }
+        if (!moduleOptions.logLevel) { return result }
         if (!defTrue(moduleOptions.logLevel[logLevel])) { return; }
 
-        return printOptions;
+        return result;
     }
 
-    private _log(logLevel: TAQLoggerDefaultLogLevel, message: string, colors: TColor[], ...data: any[]) {
-        let printOptions = this._allowLog(logLevel);
-        if (!printOptions) { return }
+    private _getModuleColor(module: TCModule | TAQLoggerDefaultModule): TColor[] {
+        const colors = this._options?.moduleColors;
+        if (!colors) { return []; }
+        const moduleColor = colors[module];
+        return moduleColor || [];
+    }
+    private _getLogLevelColor(module: TCLogLevel | TAQLoggerDefaultLogLevel): TColor[] {
+        const colors = this._options?.logLevelColors;
+        if (!colors) { return []; }
+        const moduleColor = colors[module];
+        return moduleColor || [];
+    }
 
+    private _log(
+        logLevel: TAQLoggerDefaultLogLevel,
+        message: string,
+        rawMessage: string,
+        colors: TColor[],
+        ...data: any[]) {
+
+        const permission = this._getLogLevelPermission(logLevel);
+        if (!permission) { return }
+        
+        const output = [];
         const browserStyle: Array<string> = [];
-        const moduleColor = activeModules[this._module as string];
+        const printOptions = permission.printOptions;
+        const moduleColor = this._getModuleColor(this._module);
+        const logLevelColor = this._getLogLevelColor(logLevel);
 
-        const logMessage = [];
         if (defTrue(printOptions.timestamp)) {
-            const ts = new Date().toLocaleString();
-            logMessage.push(this._paint(`${ts} `, ['dim'], browserStyle));
+            output.push(this._paint(`${getTs()} `, ['dim'], browserStyle));
         };
-        
+
         if (defTrue(printOptions.logLevel)) {
-            const str = `${`[${(logLevel as string)}]`.toUpperCase().slice(0,7).padEnd(8)}`;
-            logMessage.push(this._paint(str, ['bright'], browserStyle))
+            const str = `${`[${(logLevel as string)}]`.toUpperCase().slice(0, 7).padEnd(7)}`;
+            output.push(this._paint(str, ['bright',...logLevelColor], browserStyle), ' ');
         };
-        
+
         if (defTrue(printOptions.moduleName)) {
-            logMessage.push(this._paint(`${this._module.slice(0,9).padEnd(10)}`, moduleColor, browserStyle), ' ');
+            output.push(this._paint(`${this._module.slice(0, 10).padEnd(10)}`, moduleColor, browserStyle), ' ');
         };
-        
+
         if (defTrue(printOptions.subModule)) {
-            logMessage.push(this._paint(`${this._subModule}`.slice(0,9).padEnd(10),['fgYellow'], browserStyle), ' ');
+            output.push(this._paint(`${this._subModule}`.slice(0, 10).padEnd(10), [], browserStyle), ' ');
         };
-       
-        logMessage.push(this._paint(`\n${message}\n`, colors, browserStyle));
-        const outputMessage = logMessage.join('');
+
+        output.push(this._paint(`${message}`, colors, browserStyle));
         const outputData = [...browserStyle];
-        
-        if (printOptions.data === true) {
-            outputData.push(...data);
-        };
-        
-        console.log(outputMessage, ...outputData);
+
+        if (printOptions.data === true) { outputData.push(...data); };
+        console.log(output.join(''), ...outputData);
     }
 }
 

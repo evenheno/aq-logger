@@ -2,28 +2,25 @@ import { AQGlobalLogger } from "./class/global-logger";
 
 const globalLogger = new AQGlobalLogger({
     environment: 'development',
+    logLevelColors: {
+        info: ['bgBlue','fgWhite'],
+        warn: ['bgYellow','fgRed']
+    },
+    moduleColors: {
+        Database: ['bgRed', 'fgWhite']
+    },
     rules: {
         development: {
             modules: {
-                DB: {
-                    print: {timestamp: true}
-                },
-                Controller: {
-                    
-                }
+                Controller: {},
+                Database: {}
             }
         }
     }
 });
 
-const logger = globalLogger.create(
-        'Controller',
-        'UserController');
-        
-const logger2 = globalLogger.create(
-        'Controller',
-        'UserController');
-        
-        
-logger.success('AQLogger1 is OK');
-logger.success('Lo')
+const loggerCtl = globalLogger.create('Controller', 'UserController');
+const loggerDb = globalLogger.create('Database', 'UserController');
+
+loggerCtl.warn('warm from controller logger');
+loggerDb.info('Hello from database logger');
