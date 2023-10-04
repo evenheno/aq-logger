@@ -62,10 +62,6 @@ class AQLogger<
         this._log('debug', text, text, ['fgMagenta'], ...data);
     }
 
-    public action(text: string, ...data: any[]) {
-        this._log('debug', `${text}...`, text, ['fgYellow'], ...data);
-    }
-
     public success(text: string, ...data: any[]) {
         this._log('info', text, text, ['fgGreen'], ...data);
     }
@@ -137,6 +133,7 @@ class AQLogger<
         const moduleColor = colors[module];
         return moduleColor || [];
     }
+
     private _getLogLevelColor(module: TCLogLevel | TAQLoggerDefaultLogLevel): TColor[] {
         const colors = this._options?.logLevelColors;
         if (!colors) { return []; }
@@ -153,7 +150,7 @@ class AQLogger<
 
         const permission = this._getLogLevelPermission(logLevel);
         if (!permission) { return }
-        
+
         const output = [];
         const browserStyle: Array<string> = [];
         const printOptions = permission.printOptions;
@@ -166,7 +163,7 @@ class AQLogger<
 
         if (defTrue(printOptions.logLevel)) {
             const str = `${`[${(logLevel as string)}]`.toUpperCase().slice(0, 7).padEnd(7)}`;
-            output.push(this._paint(str, ['bright',...logLevelColor], browserStyle), ' ');
+            output.push(this._paint(str, ['bright', ...logLevelColor], browserStyle), ' ');
         };
 
         if (defTrue(printOptions.moduleName)) {
