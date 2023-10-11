@@ -11,6 +11,7 @@ import { platform } from '../const/const.js';
 import { Exception } from './exception.js';
 import { getTs } from '../global/utils.js';
 import { TLogLevelPermission } from '../types/log-level-permissions.js';
+import { AQGlobalLogger } from './global-logger.js';
 
 const defTrue = (value?: boolean) => {
     return value === false ? false : true;
@@ -24,6 +25,7 @@ class AQLogger<
     private _module: TModule;
     private _rules?: TAQLoggerRulesSet<TEnv, TLogLevel, TModule>;
     private _options?: TAQLoggerOptions<TEnv, TLogLevel, TModule>;
+    private _globalLogger?: AQGlobalLogger<TEnv, TModule, TLogLevel>;
 
     constructor(
         module: TModule,
@@ -31,6 +33,7 @@ class AQLogger<
         this._options = options;
         this._rules = options?.rules;
         this._module = module;
+        this._globalLogger = options?.globalLogger;
     }
 
     private _getColors(colors: TColor[]) {
@@ -70,7 +73,6 @@ class AQLogger<
     public success(error: any, ...data: any[]) {
         this._log('info', ['fgGreen'], `${error}`, `${error}`, ...data);
     }
-
 
     public error(error: any, ...data: any[]) {
         this._log('error', null, `${error}`, `${error}`, ...data);
@@ -179,7 +181,12 @@ class AQLogger<
         const outputData = [...browserStyle];
 
         if (printOptions.data === true) { outputData.push(...data); };
-        console.log(output.join(''), ...outputData);
+        const outputString = output.join('');
+        console.log(outputString, ...outputData);
+
+        if(this._globalLogger?.onLog){
+            this._globalLogger.onLog(`[${logLevel}] ${this._module} | ${rawMessage}`);
+        }
     }
 }
 

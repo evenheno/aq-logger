@@ -1,3 +1,4 @@
+import { AQGlobalLogger } from "../class/global-logger.js"
 import { TColor, TColorsMap } from "./colors.type.js"
 import { TDefEnv, TDefLogLevel, TDefModule } from "./defaults.type.js"
 import { TPrintOptions } from "./print-options.type.js"
@@ -15,5 +16,6 @@ export type TAQLoggerOptions<
             symbol?: string,
             header?: TColor[],
             text?: TColor[]
-        }}
+        }},
+        globalLogger?: AQGlobalLogger<TEnv,TModule, TLogLevel>
     }

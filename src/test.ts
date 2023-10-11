@@ -9,6 +9,10 @@ const globalLogger = new AQGlobalLogger({
         }
     }
 });
+
+globalLogger.onLog = (text)=> {
+    console.log(text);
+}
 const loggerCtl = globalLogger.create('system');
 
 loggerCtl.debug('Debug message');
