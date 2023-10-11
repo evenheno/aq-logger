@@ -1,3 +1,3 @@
-export type TLogLevelMap<TCLogLevel extends string> = {
-    [key in TCLogLevel]?: boolean;
+export type TLogLevelMap<TLogLevel extends string> = {
+    [key in TLogLevel]?: boolean;
 };

@@ -1,11 +1,10 @@
 import {
     TAQLoggerOptions,
     TAQLoggerRulesSet,
-    TColors,
-    TAQLoggerDefaultEnv,
-    TAQLoggerDefaultLogLevel,
-    TAQLoggerDefaultModule,
     TColor,
+    TDefEnv,
+    TDefLogLevel,
+    TDefModule,
     getColor,
 } from '../types/types.js';
 import { platform } from '../const/const.js';
@@ -18,22 +17,20 @@ const defTrue = (value?: boolean) => {
 }
 
 class AQLogger<
-    TCEnv extends string = TAQLoggerDefaultEnv,
-    TCLogLevel extends string = TAQLoggerDefaultLogLevel,
-    TCModule extends string = TAQLoggerDefaultModule>{
+    TEnv extends string = TDefEnv,
+    TLogLevel extends string = TDefLogLevel,
+    TModule extends string = TDefModule>{
 
-    private _module: TCModule | TAQLoggerDefaultModule;
-    private _subModule?: string;
-    private _rules?: TAQLoggerRulesSet<TCEnv, TCLogLevel, TCModule>;
-    private _options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>;
+    private _module: TModule;
+    private _rules?: TAQLoggerRulesSet<TEnv, TLogLevel, TModule>;
+    private _options?: TAQLoggerOptions<TEnv, TLogLevel, TModule>;
 
     constructor(
-        module: TCModule | TAQLoggerDefaultModule,
-        options?: TAQLoggerOptions<TCEnv, TCLogLevel, TCModule>) {
+        module: TModule,
+        options?: TAQLoggerOptions<TEnv, TLogLevel, TModule>) {
         this._options = options;
         this._rules = options?.rules;
         this._module = module;
-        this._subModule = options?.subModule;
     }
 
     private _getColors(colors: TColor[]) {
@@ -54,48 +51,48 @@ class AQLogger<
         }
     }
 
-    public log(logLevel: TAQLoggerDefaultLogLevel, text: string, ...data: any[]) {
-        this._log(logLevel, text, text, ['fgWhite'], ...data);
-    }
-
-    public debug(text: string, ...data: any[]) {
-        this._log('debug', text, text, ['fgMagenta'], ...data);
-    }
-
-    public success(text: string, ...data: any[]) {
-        this._log('info', text, text, ['fgGreen'], ...data);
-    }
-
-    public info(text: string, ...data: any[]) {
-        this._log('info', `${text}...`, text, ['fgCyan'], ...data);
-    }
-
-    public error(error: any, ...data: any[]) {
-        this._log('error', `${error}`, error, ['bgRed', 'fgWhite'], ...data);
+    public log(logLevel: TLogLevel | TDefLogLevel, text: string, ...data: any[]) {
+        this._log(logLevel, null, text, text, ...data);
     }
 
     public warn(text: string, ...data: any[]) {
-        this._log('warn', text, text, ['bgYellow', 'fgBlack'], ...data);
+        this._log('warn', null, `WARNING: ${text}`, text, ...data);
+    }
+
+    public debug(text: string, ...data: any[]) {
+        this._log('debug', null, text, text, ...data);
+    }
+
+    public info(text: string, ...data: any[]) {
+        this._log('info', null, text, text, ...data);
+    }
+
+    public success(error: any, ...data: any[]) {
+        this._log('info', ['fgGreen'], `${error}`, `${error}`, ...data);
+    }
+
+
+    public error(error: any, ...data: any[]) {
+        this._log('error', null, `${error}`, `${error}`, ...data);
     }
 
     public exception(message: string, error?: any) {
-        const exception = new Exception(this._module, message, error);
+        const exception = new Exception(`${this._module}`, message, error);
         return exception;
     }
 
     public throw(message: string, error: any) {
-        throw new Exception(this._module, message, error);
+        throw new Exception(`${this._module}`, message, error);
     }
 
-    private _getLogLevelPermission(logLevel: TAQLoggerDefaultLogLevel): TLogLevelPermission | undefined {
+    private _getLogLevelPermission(logLevel: TLogLevel | TDefLogLevel): TLogLevelPermission | undefined {
 
         const result: TLogLevelPermission = {
             printOptions: {
                 data: true,
                 logLevel: true,
                 moduleName: true,
-                timestamp: true,
-                subModule: true
+                timestamp: true
             }
         }
 
@@ -104,15 +101,15 @@ class AQLogger<
         }
 
         if (!this._rules) { return result; }
-        if (!this?._options?.environment) { return result; }
+        if (!this?._options?.env) { return result; }
 
-        const envRules = this._rules[this._options?.environment];
+        const envRules = this._rules[this._options?.env];
         if (!envRules) { return result; }
 
         if (envRules.print) { result.printOptions = { ...result.printOptions, ...envRules.print } }
         if (!envRules.modules) { return result; }
 
-        const moduleOptions = envRules.modules[this._module];
+        const moduleOptions = envRules.modules[this._module as string];
         if (!moduleOptions) { return result; }
         if (!defTrue(moduleOptions.allow)) { return; }
 
@@ -127,25 +124,18 @@ class AQLogger<
         return result;
     }
 
-    private _getModuleColor(module: TCModule | TAQLoggerDefaultModule): TColor[] {
+    private _getModuleColor(module: TModule): TColor[] {
         const colors = this._options?.moduleColors;
         if (!colors) { return []; }
         const moduleColor = colors[module];
         return moduleColor || [];
     }
 
-    private _getLogLevelColor(module: TCLogLevel | TAQLoggerDefaultLogLevel): TColor[] {
-        const colors = this._options?.logLevelColors;
-        if (!colors) { return []; }
-        const moduleColor = colors[module];
-        return moduleColor || [];
-    }
-
     private _log(
-        logLevel: TAQLoggerDefaultLogLevel,
+        logLevel: TLogLevel | TDefLogLevel,
+        colors: TColor[] | undefined | null,
         message: string,
         rawMessage: string,
-        colors: TColor[],
         ...data: any[]) {
 
         const permission = this._getLogLevelPermission(logLevel);
@@ -155,26 +145,37 @@ class AQLogger<
         const browserStyle: Array<string> = [];
         const printOptions = permission.printOptions;
         const moduleColor = this._getModuleColor(this._module);
-        const logLevelColor = this._getLogLevelColor(logLevel);
+
+        let logLevelColor: TColor[] = [];
+        let logLevelHeaderColor: TColor[] = [];
+        let logLevelSymbol: string | undefined;
+
+        if (this._options?.logLevelColors) {
+            const entry = this._options.logLevelColors[logLevel];
+            if (entry) {
+                logLevelColor = entry.text || [];
+                logLevelHeaderColor = entry.header || [];
+                logLevelSymbol = entry.symbol;
+            }
+        }
+        if (colors) { logLevelColor = colors || [] }
 
         if (defTrue(printOptions.timestamp)) {
             output.push(this._paint(`${getTs()} `, ['dim'], browserStyle));
         };
 
         if (defTrue(printOptions.logLevel)) {
-            const str = `${`[${(logLevel as string)}]`.toUpperCase().slice(0, 7).padEnd(7)}`;
-            output.push(this._paint(str, ['bright', ...logLevelColor], browserStyle), ' ');
+            const symbol = logLevelSymbol ? `${logLevelSymbol} ` : ' ';
+            const str = `${`[${(logLevel as string)}]`.toUpperCase().slice(0, 8).padEnd(8)}`;
+            output.push(this._paint(`${symbol}${str}`, ['bright', ...logLevelHeaderColor], browserStyle), ' ');
         };
 
         if (defTrue(printOptions.moduleName)) {
-            output.push(this._paint(`${this._module.slice(0, 10).padEnd(10)}`, moduleColor, browserStyle), ' ');
+            const moduleName = `@${this._module}`.slice(0, 13).padEnd(13);
+            output.push(this._paint(moduleName, moduleColor, browserStyle), ' ');
         };
 
-        if (defTrue(printOptions.subModule)) {
-            output.push(this._paint(`${this._subModule}`.slice(0, 10).padEnd(10), [], browserStyle), ' ');
-        };
-
-        output.push(this._paint(`${message}`, colors, browserStyle));
+        output.push(this._paint(`${message}`, logLevelColor, browserStyle));
         const outputData = [...browserStyle];
 
         if (printOptions.data === true) { outputData.push(...data); };

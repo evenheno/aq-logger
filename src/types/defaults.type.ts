@@ -1,13 +1,13 @@
-export type TAQLoggerDefaultModule =
-    | 'System';
+export type TDefModule =
+    | 'system';
 
-export type TAQLoggerDefaultEnv =
+export type TDefEnv =
     | 'development'
     | 'test'
     | 'staging'
     | 'production';
 
-export type TAQLoggerDefaultLogLevel =
+export type TDefLogLevel =
     | 'debug'
     | 'info'
     | 'warn'
@@ -15,3 +15,6 @@ export type TAQLoggerDefaultLogLevel =
     | 'critical'
     | 'alert'
     | 'emergency';
+
+
+export type TStr<T extends string> = T;

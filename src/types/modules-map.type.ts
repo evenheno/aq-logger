@@ -1,6 +1,8 @@
-import { TAQLoggerDefaultModule } from "./defaults.type.js";
+import { TDefLogLevel, TDefModule } from "./defaults.type.js";
 import { TLogOptions } from "./module-options.type.js";
 
-export type TModulesMap<TCModule extends string, TCLogLevel extends string> = {
-    [key in TAQLoggerDefaultModule | TCModule]?: TLogOptions<TCLogLevel>;
-};
+export type TModulesMap<
+    TModule extends string,
+    TLogLevel extends string> = {
+        [key in TModule | TDefModule as string]?: TLogOptions<TLogLevel | TDefLogLevel>;
+    };
